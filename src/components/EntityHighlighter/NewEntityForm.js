@@ -9,16 +9,20 @@ const NewEntityForm = ({
 }) => {
     const textInput = useRef(null);
 
-    const handleClick = () => {
-        // Add new entity
-        onSubmit(textInput.current.value, entity);
-        // Clear input value
-        textInput.current.value = '';
-    };
-
     useEffect(() => {
         textInput.current.value = entity ? entity.label : '';
     }, [entity])
+
+    const handleClick = () => {
+        if (textInput.current.value) {
+            // Add new entity
+            onSubmit(textInput.current.value, entity);
+            // Clear input value
+            textInput.current.value = '';
+        } else {
+            textInput.current.focus();
+        }
+    };
 
     // Submit on Enter
     const handleKeyPress = (evt) => {
