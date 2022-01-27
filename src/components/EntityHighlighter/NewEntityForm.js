@@ -1,19 +1,24 @@
-import React, { useRef } from 'react';
+import React, { useRef, useEffect } from 'react';
 
 const ENTER_KEY_CODE = 13;
 
 const NewEntityForm = ({
     isDisabled = false,
+    entity = null,
     onSubmit = () => { }
 }) => {
     const textInput = useRef(null);
 
     const handleClick = () => {
         // Add new entity
-        onSubmit(textInput.current.value);
+        onSubmit(textInput.current.value, entity);
         // Clear input value
         textInput.current.value = '';
     };
+
+    useEffect(() => {
+        textInput.current.value = entity ? entity.label : '';
+    }, [entity])
 
     // Submit on Enter
     const handleKeyPress = (evt) => {
@@ -35,7 +40,7 @@ const NewEntityForm = ({
             <button
                 onClick={handleClick}
                 disabled={isDisabled}
-            >Add entity for selection</button>
+            >{entity ? 'Update' : 'Add'} entity for selection</button>
         </div>
     );
 };

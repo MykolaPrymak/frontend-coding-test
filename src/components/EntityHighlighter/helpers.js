@@ -17,3 +17,17 @@ export function hashString(str) {
 export function findEntities(entities, position) {
     return entities.filter(e => e.start <= position && e.end > position);
 }
+
+export function findEntity(entities, start, end) {
+    if (start === end) {
+        return null;
+    }
+
+    return entities.find(entity => entity.start === start && entity.end === end) || null;
+}
+
+export function removeEntity(entities, entity) {
+    return entities.filter(({ start, end, label }) => {
+        return !(start === entity.start && end === entity.end && label === entity.label);
+    });
+};

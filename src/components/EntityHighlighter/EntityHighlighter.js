@@ -2,7 +2,7 @@ import React from 'react';
 import EntityListRenderer from './EntityListRenderer';
 import NewEntityForm from './NewEntityForm';
 import colors from './colors';
-import { hashString } from './helpers';
+import { hashString, findEntity, removeEntity } from './helpers';
 
 const styles = {
   text: {},
@@ -34,23 +34,27 @@ class EntityHighlighter extends React.Component {
   constructor(props) {
     super(props);
 
-    this.state = { selectionStart: 0, selectionEnd: 0 };
+    this.state = { selectionStart: 0, selectionEnd: 0, selectedEntity: null };
   }
 
   componentDidMount() {
-    // Todo: make external
+    // TODO: make external
     this.selectionChangeHandler = (event) => {
       const target = event.target;
 
       if (
         target === this.inputNode
       ) {
+        const { selectionStart, selectionEnd }= this.inputNode;
+
         this.setState({
-          selectionStart: this.inputNode.selectionStart,
-          selectionEnd: this.inputNode.selectionEnd
+          selectionStart: selectionStart,
+          selectionEnd: selectionEnd,
+          selectedEntity: findEntity(this.props.entities, selectionStart, selectionEnd)
         });
       }
     };
+
     document.addEventListener('select', this.selectionChangeHandler, false);
     document.addEventListener('click', this.selectionChangeHandler, false);
     document.addEventListener('keydown', this.selectionChangeHandler, false);
@@ -107,10 +111,6 @@ class EntityHighlighter extends React.Component {
     onChange(text, entities);
   }
 
-  findEntities = (index) => {
-    return this.props.entities.filter(e => e.start <= index && e.end > index);
-  };
-
   renderEntityHighlight = (text, entity, key) => {
     const start = text.substr(0, entity.start);
     const end = text.substr(entity.end);
@@ -126,27 +126,28 @@ class EntityHighlighter extends React.Component {
     );
   };
 
-  addEntity = (entityLabel) => {
-    const {onChange, text, entities} = this.props;
+  addEntity = (entityLabel, oldEntity) => {
+    const {onChange, text } = this.props;
+    let entities = this.props.entities;
     const { selectionStart, selectionEnd } = this.state;
+
+    // Remove old one if any
+    if (oldEntity) {
+      entities = removeEntity(entities, oldEntity);
+    }
 
     onChange(text, entities.concat({ start: selectionStart, end: selectionEnd, label: entityLabel }));
 
-    this.setState({selectionStart: 0, selectionEnd: 0});
+    this.setState({selectionStart: 0, selectionEnd: 0, selectedEntity: null});
   }
 
   deleteEntity = (entity) => {    
-    // Remove the provided entity from the list
-    const entities = this.props.entities.filter(({start, end, label}) => {
-      return !(start === entity.start && end === entity.end && label === entity.label);
-    });
-    
-    this.props.onChange(this.props.text, entities);
+    this.props.onChange(this.props.text, removeEntity(this.props.entities, entity));
   }
 
   render() {
     const { text, entities = [] } = this.props;
-    const {selectionStart, selectionEnd} = this.state;
+    const {selectionStart, selectionEnd, selectedEntity} = this.state;
     const isSelectionEmpty = selectionStart === selectionEnd;
 
     return (
@@ -163,11 +164,13 @@ class EntityHighlighter extends React.Component {
             value={text}
             rows={10}
           />
+
           {entities.map((entity, index) => this.renderEntityHighlight(text, entity, index))}
         </div>
         <br />
           <NewEntityForm
             isDisabled={isSelectionEmpty}
+            entity={selectedEntity}
             onSubmit={this.addEntity}
           />
 
