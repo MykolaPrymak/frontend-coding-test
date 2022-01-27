@@ -37,35 +37,6 @@ class EntityHighlighter extends React.Component {
     this.state = { selectionStart: 0, selectionEnd: 0, selectedEntity: null };
   }
 
-  componentDidMount() {
-    // TODO: make external
-    this.selectionChangeHandler = (event) => {
-      const target = event.target;
-
-      if (
-        target === this.inputNode
-      ) {
-        const { selectionStart, selectionEnd }= this.inputNode;
-
-        this.setState({
-          selectionStart: selectionStart,
-          selectionEnd: selectionEnd,
-          selectedEntity: findEntity(this.props.entities, selectionStart, selectionEnd)
-        });
-      }
-    };
-
-    document.addEventListener('select', this.selectionChangeHandler, false);
-    document.addEventListener('click', this.selectionChangeHandler, false);
-    document.addEventListener('keydown', this.selectionChangeHandler, false);
-  }
-
-  componentWillUnmount() {
-    document.removeEventListener('select', this.selectionChangeHandler);
-    document.removeEventListener('click', this.selectionChangeHandler);
-    document.removeEventListener('keydown', this.selectionChangeHandler);
-  }
-
   handleTextChange(event) {
     const { text: oldText, entities: oldEntities, onChange } = this.props;
     const text = event.target.value;
@@ -145,6 +116,16 @@ class EntityHighlighter extends React.Component {
     this.props.onChange(this.props.text, removeEntity(this.props.entities, entity));
   }
 
+  selectionChangeHandler = (event) => {
+    const { selectionStart, selectionEnd }= event.target;
+
+    this.setState({
+      selectionStart: selectionStart,
+      selectionEnd: selectionEnd,
+      selectedEntity: findEntity(this.props.entities, selectionStart, selectionEnd)
+    });
+  };
+
   render() {
     const { text, entities = [] } = this.props;
     const {selectionStart, selectionEnd, selectedEntity} = this.state;
@@ -155,11 +136,9 @@ class EntityHighlighter extends React.Component {
         <div style={{ position: 'relative' }}>
           <textarea
             style={styles.input}
-            ref={node => {
-              if (node) {
-                this.inputNode = node;
-              }
-            }}
+            onSelect={this.selectionChangeHandler}
+            onClick={this.selectionChangeHandler}
+            onKeyDown={this.selectionChangeHandler}
             onChange={event => this.handleTextChange(event)}
             value={text}
             rows={10}
