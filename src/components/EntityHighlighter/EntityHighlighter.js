@@ -35,6 +35,7 @@ class EntityHighlighter extends React.Component {
   }
 
   componentDidMount() {
+    // Todo: make external
     this.selectionChangeHandler = (event) => {
       const target = event.target;
 
@@ -103,19 +104,16 @@ class EntityHighlighter extends React.Component {
     onChange(text, entities);
   }
 
-  focus() {
-    if (this.inputNode) this.inputNode.focus();
-  }
-
   findEntities = (index) => {
     return this.props.entities.filter(e => e.start <= index && e.end > index);
   };
 
   renderEntityHighlight = (text, entity, key) => {
     const start = text.substr(0, entity.start);
-    const value = text.substr(entity.start, entity.end - entity.start);
     const end = text.substr(entity.end);
+    const value = text.substr(entity.start, entity.end - entity.start);
     const color = colors[hashString(entity.label) % colors.length].bg;
+
     return (
       <div key={key} style={{ ...styles.zeroPos, ...styles.highlightText }}>
         <span>{start}</span>
@@ -125,10 +123,21 @@ class EntityHighlighter extends React.Component {
     );
   };
 
-  deleteEntity = (entity) => {
-    const entities = this.props.entities;
-    const deleted = this.props.entities.findIndex(e => e.start === entity.start && e.end === entity.end && e.label === entity.label);
-    entities.splice(deleted, 1);
+  addEntity = () => {
+    const {onChange, text, entities} = this.props;
+    const {selectionStart, selectionEnd, text: entityLabel} = this.state;
+
+    onChange(text, entities.concat({ start: selectionStart, end: selectionEnd, label: entityLabel }));
+
+    this.setState({text: '', selectionStart: 0, selectionEnd: 0});
+  }
+
+  deleteEntity = (entity) => {    
+    // Remove the provided entity from the list
+    const entities = this.props.entities.filter(({start, end, label}) => {
+      return start === entity.start && end === entity.end && label === entity.label;
+    });
+    
     this.props.onChange(this.props.text, entities);
   }
 
@@ -161,13 +170,13 @@ class EntityHighlighter extends React.Component {
             disabled={this.state.selectionStart === this.state.selectionEnd}
           />
           <button
-            onClick={() => this.props.onChange(text, entities.concat({ start: this.state.selectionStart, end: this.state.selectionEnd, label: this.state.text }))}
+            onClick={this.addEntity}
             disabled={this.state.selectionStart === this.state.selectionEnd}
           >Add entity for selection</button>
         </div>
         {this.state.selectionStart === this.state.selectionEnd && this.findEntities(this.state.selectionStart).length > 0 && (
           <div style={{ marginTop: 10 }}>
-            {this.findEntities(this.state.selectionStart).map((e,i) => (
+            {this.findEntities(this.state.selectionStart).map((e, i) => (
               <span key={i}>
                 {this.props.text.substring(e.start, e.end)} ({e.label})
                 <button
