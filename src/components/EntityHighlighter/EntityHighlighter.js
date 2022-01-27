@@ -1,4 +1,5 @@
 import React from 'react';
+import EntityListRenderer from './EntityListRenderer';
 import colors from './colors';
 import { hashString } from './helpers';
 
@@ -135,7 +136,7 @@ class EntityHighlighter extends React.Component {
   deleteEntity = (entity) => {    
     // Remove the provided entity from the list
     const entities = this.props.entities.filter(({start, end, label}) => {
-      return start === entity.start && end === entity.end && label === entity.label;
+      return !(start === entity.start && end === entity.end && label === entity.label);
     });
     
     this.props.onChange(this.props.text, entities);
@@ -143,6 +144,8 @@ class EntityHighlighter extends React.Component {
 
   render() {
     const { text, entities = [] } = this.props;
+    const {selectionStart, selectionEnd} = this.state;
+    const isSelectionEmpty = selectionStart === selectionEnd;
 
     return (
       <div>
@@ -167,28 +170,21 @@ class EntityHighlighter extends React.Component {
             placeholder="Entity label"
             value={this.state.text}
             onChange={(event) => this.setState({ text: event.target.value })}
-            disabled={this.state.selectionStart === this.state.selectionEnd}
+            disabled={isSelectionEmpty}
           />
           <button
             onClick={this.addEntity}
-            disabled={this.state.selectionStart === this.state.selectionEnd}
+            disabled={isSelectionEmpty}
           >Add entity for selection</button>
         </div>
-        {this.state.selectionStart === this.state.selectionEnd && this.findEntities(this.state.selectionStart).length > 0 && (
-          <div style={{ marginTop: 10 }}>
-            {this.findEntities(this.state.selectionStart).map((e, i) => (
-              <span key={i}>
-                {this.props.text.substring(e.start, e.end)} ({e.label})
-                <button
-                  style={{ border: '0 none', cursor: 'pointer', backgroundColor: 'transparent' }}
-                  onClick={() => this.deleteEntity(e)}
-                >
-                  <span role="img" aria-label="Delete">🗑️</span>
-                </button>
-              </span>
-            ))}
-          </div>
-        )}
+
+          <EntityListRenderer
+            isVisible={!isSelectionEmpty}
+            text={text}
+            entities={entities}
+            startIdx={selectionStart}
+            onDelete={this.deleteEntity}
+           />
       </div>
     );
   }
