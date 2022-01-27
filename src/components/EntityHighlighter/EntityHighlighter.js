@@ -2,7 +2,7 @@ import React from 'react';
 import HighlightEntities from './HighlightEntities';
 import EntityActionList from './EntityActionList';
 import NewEntityForm from './NewEntityForm';
-import { findEntity, removeEntity } from './helpers';
+import { findEntity, removeEntity, findClosestStart } from './helpers';
 
 const styles = {
   input: {
@@ -30,29 +30,9 @@ class EntityHighlighter extends React.Component {
     // update the entity boudaries
 
     oldEntities.forEach(oldEntity => {
-      const oldSelection = oldText.substr(oldEntity.start, oldEntity.end - oldEntity.start);
-
-      function findClosestStart(lastMatch) {
-        if (lastMatch == null) {
-          const index = text.indexOf(oldSelection);
-          if (index === -1) {
-            return index;
-          }
-          return findClosestStart(index);
-        }
-        const from = lastMatch + oldSelection.length;
-        const index = text.indexOf(oldSelection, from);
-        if (index === -1) {
-          return lastMatch;
-        }
-        const prevDiff = Math.abs(oldEntity.start - lastMatch);
-        const nextDiff = Math.abs(oldEntity.start - index);
-        if (prevDiff < nextDiff) {
-          return lastMatch;
-        }
-        return findClosestStart(index);
-      }
-      const start = findClosestStart();
+      const oldSelection = oldText.substr(oldEntity.start, oldEntity.end - oldEntity.start);  
+      const start = findClosestStart(text, oldSelection, oldEntity);
+  
       if (start === -1) {
         return;
       }

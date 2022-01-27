@@ -23,9 +23,9 @@ const HighlightEntity = ({
   text = '',
   entity = null,
 }) => {
-  const start = text.substr(0, entity.start);
-  const end = text.substr(entity.end);
-  const value = text.substr(entity.start, entity.end - entity.start);
+  const start = text.substring(0, entity.start);
+  const end = text.substring(entity.end);
+  const value = text.substring(entity.start, entity.end);
   const color = colors[hashString(entity.label) % colors.length].bg;
 
   return (

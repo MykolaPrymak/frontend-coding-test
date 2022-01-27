@@ -31,3 +31,27 @@ export function removeEntity(entities, entity) {
         return !(start === entity.start && end === entity.end && label === entity.label);
     });
 };
+
+export function findClosestStart(text, oldSelection, oldEntity, lastMatch) {
+    if (lastMatch === undefined) {
+      const index = text.indexOf(oldSelection);
+      if (index === -1) {
+        return index;
+      }
+      return findClosestStart(text, oldSelection, oldEntity, index);
+    }
+
+    const from = lastMatch + oldSelection.length;
+    const index = text.indexOf(oldSelection, from);
+    if (index === -1) {
+      return lastMatch;
+    }
+
+    const prevDiff = Math.abs(oldEntity.start - lastMatch);
+    const nextDiff = Math.abs(oldEntity.start - index);
+    if (prevDiff < nextDiff) {
+      return lastMatch;
+    }
+
+    return findClosestStart(text, oldSelection, oldEntity, index);
+  }
