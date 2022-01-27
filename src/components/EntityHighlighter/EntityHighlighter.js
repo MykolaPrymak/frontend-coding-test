@@ -1,5 +1,5 @@
 import React from 'react';
-import EntityListRenderer from './EntityListRenderer';
+import EntityActionList from './EntityActionList';
 import NewEntityForm from './NewEntityForm';
 import colors from './colors';
 import { hashString, findEntity, removeEntity } from './helpers';
@@ -153,7 +153,7 @@ class EntityHighlighter extends React.Component {
             onSubmit={this.addEntity}
           />
 
-          <EntityListRenderer
+          <EntityActionList
             isVisible={!isSelectionEmpty}
             text={text}
             entities={entities}

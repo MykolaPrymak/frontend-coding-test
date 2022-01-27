@@ -10,7 +10,7 @@ const styles = {
     },
 };
 
-const EntityListRenderer = ({
+const EntityActionList = ({
     isVisible = false,
     text = '',
     entities = [],
@@ -42,4 +42,4 @@ const EntityListRenderer = ({
     )
 };
 
-export default EntityListRenderer;
+export default EntityActionList;
