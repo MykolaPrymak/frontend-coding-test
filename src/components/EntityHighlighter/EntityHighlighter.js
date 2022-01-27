@@ -15,8 +15,8 @@ const styles = {
   zeroPos: {
     textAlign: 'left',
     position: 'absolute',
-    top: 1,
-    left: 1,
+    top: 4,
+    left: 2,
   },
   input: {
     fontFamily: 'source-code-pro, Menlo, Monaco, Consolas, "Courier New", monospace',
