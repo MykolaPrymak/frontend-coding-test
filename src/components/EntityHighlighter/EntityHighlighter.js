@@ -68,7 +68,7 @@ class EntityHighlighter extends React.Component {
   }
 
   addEntity = (entityLabel, oldEntity) => {
-    const {onChange, text } = this.props;
+    const { onChange, text } = this.props;
     let entities = this.props.entities;
     const { selectionStart, selectionEnd } = this.state;
 
@@ -79,15 +79,15 @@ class EntityHighlighter extends React.Component {
 
     onChange(text, entities.concat({ start: selectionStart, end: selectionEnd, label: entityLabel }));
 
-    this.setState({selectionStart: 0, selectionEnd: 0, selectedEntity: null});
+    this.setState({ selectionStart: 0, selectionEnd: 0, selectedEntity: null });
   }
 
-  deleteEntity = (entity) => {    
+  deleteEntity = (entity) => {
     this.props.onChange(this.props.text, removeEntity(this.props.entities, entity));
   }
 
   selectionChangeHandler = (event) => {
-    const { selectionStart, selectionEnd }= event.target;
+    const { selectionStart, selectionEnd } = event.target;
 
     this.setState({
       selectionStart: selectionStart,
@@ -98,7 +98,7 @@ class EntityHighlighter extends React.Component {
 
   render() {
     const { text, entities = [] } = this.props;
-    const {selectionStart, selectionEnd, selectedEntity} = this.state;
+    const { selectionStart, selectionEnd, selectedEntity } = this.state;
     const isSelectionEmpty = selectionStart === selectionEnd;
 
     return (
@@ -114,22 +114,27 @@ class EntityHighlighter extends React.Component {
             rows={10}
           />
 
-          <HighlightEntities text={text} entities={entities} />
-        </div>
-        <br />
-          <NewEntityForm
-            isDisabled={isSelectionEmpty}
-            entity={selectedEntity}
-            onSubmit={this.addEntity}
-          />
-
-          <EntityActionList
-            isVisible={!isSelectionEmpty}
+          <HighlightEntities
             text={text}
             entities={entities}
-            startIdx={selectionStart}
-            onDelete={this.deleteEntity}
-           />
+            selectionStart={selectionStart}
+            selectionEnd={selectionEnd}
+          />
+        </div>
+        <br />
+        <NewEntityForm
+          isDisabled={isSelectionEmpty}
+          entity={selectedEntity}
+          onSubmit={this.addEntity}
+        />
+
+        <EntityActionList
+          isVisible={!isSelectionEmpty}
+          text={text}
+          entities={entities}
+          startIdx={selectionStart}
+          onDelete={this.deleteEntity}
+        />
       </div>
     );
   }
