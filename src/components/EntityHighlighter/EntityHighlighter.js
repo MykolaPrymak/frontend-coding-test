@@ -1,5 +1,6 @@
 import React from 'react';
 import EntityListRenderer from './EntityListRenderer';
+import NewEntityForm from './NewEntityForm';
 import colors from './colors';
 import { hashString } from './helpers';
 
@@ -32,7 +33,8 @@ const styles = {
 class EntityHighlighter extends React.Component {
   constructor(props) {
     super(props);
-    this.state = { selectionStart: 0, selectionEnd: 0, text: '' };
+
+    this.state = { selectionStart: 0, selectionEnd: 0 };
   }
 
   componentDidMount() {
@@ -124,13 +126,13 @@ class EntityHighlighter extends React.Component {
     );
   };
 
-  addEntity = () => {
+  addEntity = (entityLabel) => {
     const {onChange, text, entities} = this.props;
-    const {selectionStart, selectionEnd, text: entityLabel} = this.state;
+    const { selectionStart, selectionEnd } = this.state;
 
     onChange(text, entities.concat({ start: selectionStart, end: selectionEnd, label: entityLabel }));
 
-    this.setState({text: '', selectionStart: 0, selectionEnd: 0});
+    this.setState({selectionStart: 0, selectionEnd: 0});
   }
 
   deleteEntity = (entity) => {    
@@ -164,19 +166,10 @@ class EntityHighlighter extends React.Component {
           {entities.map((entity, index) => this.renderEntityHighlight(text, entity, index))}
         </div>
         <br />
-        <div>
-          <input
-            type="text"
-            placeholder="Entity label"
-            value={this.state.text}
-            onChange={(event) => this.setState({ text: event.target.value })}
-            disabled={isSelectionEmpty}
+          <NewEntityForm
+            isDisabled={isSelectionEmpty}
+            onSubmit={this.addEntity}
           />
-          <button
-            onClick={this.addEntity}
-            disabled={isSelectionEmpty}
-          >Add entity for selection</button>
-        </div>
 
           <EntityListRenderer
             isVisible={!isSelectionEmpty}
