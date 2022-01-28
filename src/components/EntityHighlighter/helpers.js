@@ -32,7 +32,7 @@ export function removeEntity(entities, entity) {
     });
 };
 
-export function findClosestStart(text, oldSelection, oldEntity, lastMatch) {
+function findClosestStart(text, oldSelection, oldEntity, lastMatch) {
     if (lastMatch === undefined) {
         const index = text.indexOf(oldSelection);
         if (index === -1) {
@@ -54,4 +54,22 @@ export function findClosestStart(text, oldSelection, oldEntity, lastMatch) {
     }
 
     return findClosestStart(text, oldSelection, oldEntity, index);
+}
+
+export function updateEntitiesBoudaries(newText, oldText, entities) {
+    // update the entity boudaries
+    return entities.map(entity => {
+        const oldSelection = oldText.substr(entity.start, entity.end - entity.start);
+        const start = findClosestStart(newText, oldSelection, entity);
+
+        if (start === -1) {
+            return null;
+        }
+
+        return ({
+            ...entity,
+            start,
+            end: start + oldSelection.length,
+        });
+    }).filter(entity => entity !== null);
 }

@@ -2,7 +2,7 @@ import React from 'react';
 import HighlightEntities from './HighlightEntities';
 import EntityActionList from './EntityActionList';
 import NewEntityForm from './NewEntityForm';
-import { findEntity, removeEntity, findClosestStart } from './helpers';
+import { findEntity, removeEntity, updateEntitiesBoudaries } from './helpers';
 
 const styles = {
   input: {
@@ -20,31 +20,6 @@ class EntityHighlighter extends React.Component {
     super(props);
 
     this.state = { selectionStart: 0, selectionEnd: 0, selectedEntity: null };
-  }
-
-  handleTextChange(event) {
-    const { text: oldText, entities: oldEntities, onChange } = this.props;
-    const text = event.target.value;
-    const entities = [];
-
-    // update the entity boudaries
-
-    oldEntities.forEach(oldEntity => {
-      const oldSelection = oldText.substr(oldEntity.start, oldEntity.end - oldEntity.start);  
-      const start = findClosestStart(text, oldSelection, oldEntity);
-  
-      if (start === -1) {
-        return;
-      }
-
-      entities.push({
-        ...oldEntity,
-        start,
-        end: start + oldSelection.length,
-      });
-    });
-
-    onChange(text, entities);
   }
 
   addEntity = (entityLabel, oldEntity) => {
@@ -75,6 +50,13 @@ class EntityHighlighter extends React.Component {
       selectedEntity: findEntity(this.props.entities, selectionStart, selectionEnd)
     });
   };
+
+  handleTextChange = (event) => {
+    const { text: oldText, entities, onChange } = this.props;
+    const text = event.target.value;
+
+    onChange(text, updateEntitiesBoudaries(text, oldText, entities));
+  }
 
   render() {
     const { text, entities = [] } = this.props;
