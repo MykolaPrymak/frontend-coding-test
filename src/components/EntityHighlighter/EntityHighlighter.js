@@ -89,7 +89,7 @@ class EntityHighlighter extends React.Component {
             onSelect={this.selectionChangeHandler}
             onClick={this.selectionChangeHandler}
             onKeyDown={this.selectionChangeHandler}
-            onChange={event => this.handleTextChange(event)}
+            onChange={this.handleTextChange}
             value={text}
             rows={10}
           />
