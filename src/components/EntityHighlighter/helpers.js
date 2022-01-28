@@ -66,9 +66,30 @@ export function updateEntitiesBoudaries(newText = '', oldText = '', entities) {
         // Return entity with all occurencies
         return { entity, occurencies };
     }).map(({ entity, occurencies }) => {
-        // No occurencies - remove
+        // TODO: If changed text is too small (1 char) and diff is big (> text length change) and there's no more of that text occurencies - remove entity
+
+        // No occurencies - check if change occur inside this entity
         if (occurencies.length === 0) {
-            return null;
+            const prefix_text = oldText.substring(0, entity.start);
+            const suffix_text = oldText.substring(entity.end);
+
+            // We have the same text before (if there's one) the entity and after it (if there's one) in new text
+            // And there's some text between tehem
+            const preffix_text_position = newText.indexOf(prefix_text);
+            const suffix_text_position = newText.indexOf(suffix_text);
+
+            if (
+                (prefix_text === '' || preffix_text_position === 0) &&
+                (suffix_text === '' || suffix_text_position > prefix_text.length)
+            ) {
+                return ({
+                    ...entity,
+                    start: preffix_text_position + prefix_text.length,
+                    end: suffix_text === '' ? newText.length : suffix_text_position
+                });
+            } else {
+                return null;
+            }
         }
 
         // One occurence - move to a new position

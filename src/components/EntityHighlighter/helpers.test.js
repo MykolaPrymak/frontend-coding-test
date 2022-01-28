@@ -242,6 +242,7 @@ describe('updateEntitiesBoudaries', () => {
   const oldText = 'first word is here';
   const entities = [
     { start: 0, end: 5, label: 'one' },
+    { start: 1, end: 4, label: 'one_2' },
     { start: 14, end: 18, label: 'two' },
     { start: 11, end: 13, label: 'three' },
   ];
@@ -249,12 +250,14 @@ describe('updateEntitiesBoudaries', () => {
   it('will update boudaries on text change at the beginning of the string', () => {
     expect(updateEntitiesBoudaries('aafirst word is here', oldText, entities)).toStrictEqual([
       { start: 2, end: 7, label: 'one' },
+      { start: 3, end: 6, label: 'one_2' },
       { start: 16, end: 20, label: 'two' },
       { start: 13, end: 15, label: 'three' }
     ]);
 
     expect(updateEntitiesBoudaries('some first word is here', oldText, entities)).toStrictEqual([
       { start: 5, end: 10, label: 'one' },
+      { start: 6, end: 9, label: 'one_2' },
       { start: 19, end: 23, label: 'two' },
       { start: 16, end: 18, label: 'three' }
     ]);
@@ -263,12 +266,14 @@ describe('updateEntitiesBoudaries', () => {
   it('will update boudaries on text change at the end of the entity if need', () => {
     expect(updateEntitiesBoudaries('firsttt word is here', oldText, entities)).toStrictEqual([
       { start: 0, end: 5, label: 'one' },
+      { start: 1, end: 4, label: 'one_2' },
       { start: 16, end: 20, label: 'two' },
       { start: 13, end: 15, label: 'three' },
     ]);
 
     expect(updateEntitiesBoudaries('first word iss here', oldText, entities)).toStrictEqual([
       { start: 0, end: 5, label: 'one' },
+      { start: 1, end: 4, label: 'one_2' },
       { start: 15, end: 19, label: 'two' },
       { start: 11, end: 13, label: 'three' },
     ]);
@@ -277,14 +282,32 @@ describe('updateEntitiesBoudaries', () => {
   it('will update boudaries on text change at the beginning of the entity if need', () => {
     expect(updateEntitiesBoudaries('ffirst word fis here', oldText, entities)).toStrictEqual([
       { start: 1, end: 6, label: 'one' },
+      { start: 2, end: 5, label: 'one_2' },
       { start: 16, end: 20, label: 'two' },
       { start: 13, end: 15, label: 'three' },
     ]);
 
     expect(updateEntitiesBoudaries('afirst word uis here', oldText, entities)).toStrictEqual([
       { start: 1, end: 6, label: 'one' },
+      { start: 2, end: 5, label: 'one_2' },
       { start: 16, end: 20, label: 'two' },
       { start: 13, end: 15, label: 'three' },
+    ]);
+
+    expect(updateEntitiesBoudaries('fairst word is here', 'first word is here', [
+      { start: 1, end: 2, label: 'one' },
+      { start: 14, end: 18, label: 'two' },
+    ])).toStrictEqual([
+      { start: 2, end: 3, label: 'one' },
+      { start: 15, end: 19, label: 'two' },
+    ]);
+
+    expect(updateEntitiesBoudaries('farsit word is here', 'first word is here', [
+      { start: 1, end: 2, label: 'one' },
+      { start: 14, end: 18, label: 'two' },
+    ])).toStrictEqual([
+      { start: 4, end: 5, label: 'one' },
+      { start: 15, end: 19, label: 'two' },
     ]);
   });
 
@@ -300,12 +323,14 @@ describe('updateEntitiesBoudaries', () => {
     it('in the middle of the two entities', () => {
       expect(updateEntitiesBoudaries('first first word is here', oldText, entities)).toStrictEqual([
         { start: 0, end: 5, label: 'one' },
+        { start: 1, end: 4, label: 'one_2' },
         { start: 20, end: 24, label: 'two' },
         { start: 17, end: 19, label: 'three' }
       ]);
 
       expect(updateEntitiesBoudaries('first word is now here', oldText, entities)).toStrictEqual([
         { start: 0, end: 5, label: 'one' },
+        { start: 1, end: 4, label: 'one_2' },
         { start: 18, end: 22, label: 'two' },
         { start: 11, end: 13, label: 'three' },
       ]);
@@ -314,6 +339,7 @@ describe('updateEntitiesBoudaries', () => {
     it('in two placess in the middle of two entites', () => {
       expect(updateEntitiesBoudaries('first brave word is now here', oldText, entities)).toStrictEqual([
         { start: 0, end: 5, label: 'one' },
+        { start: 1, end: 4, label: 'one_2' },
         { start: 24, end: 28, label: 'two' },
         { start: 17, end: 19, label: 'three' },
       ]);
@@ -322,6 +348,7 @@ describe('updateEntitiesBoudaries', () => {
     it('in two placess in the middle of two entites and in the end of the string', () => {
       expect(updateEntitiesBoudaries('first brave word is now here, as we expected', oldText, entities)).toStrictEqual([
         { start: 0, end: 5, label: 'one' },
+        { start: 1, end: 4, label: 'one_2' },
         { start: 24, end: 28, label: 'two' },
         { start: 17, end: 19, label: 'three' },
       ]);
@@ -330,17 +357,141 @@ describe('updateEntitiesBoudaries', () => {
     it('in two placess in the middle of two entites and in the begining and the end of the string', () => {
       expect(updateEntitiesBoudaries('Is first brave word is now here, as we expected?', oldText, entities)).toStrictEqual([
         { start: 3, end: 8, label: 'one' },
+        { start: 4, end: 7, label: 'one_2' },
         { start: 27, end: 31, label: 'two' },
         { start: 20, end: 22, label: 'three' },
       ]);
     });
   });
 
-  it.skip('in the middle of the entity', () => {
-    expect(updateEntitiesBoudaries('firast word is here', oldText, entities)).toStrictEqual([
-      { start: 0, end: 6, label: 'one' },
-      { start: 15, end: 19, label: 'two' },
-      { start: 12, end: 14, label: 'three' },
+  it('will remove missing entity', () => {
+    expect(updateEntitiesBoudaries('word is here', oldText, entities)).toStrictEqual([
+      { start: 8, end: 12, label: 'two' },
+      { start: 5, end: 7, label: 'three' },
     ]);
+
+    expect(updateEntitiesBoudaries('ft word is here', oldText, entities)).toStrictEqual([
+      { start: 0, end: 2, label: 'one' },
+      { start: 11, end: 15, label: 'two' },
+      { start: 8, end: 10, label: 'three' },
+    ]);
+
+    expect(updateEntitiesBoudaries('first  is here', oldText, entities)).toStrictEqual([
+      { start: 0, end: 5, label: 'one' },
+      { start: 1, end: 4, label: 'one_2' },
+      { start: 10, end: 14, label: 'two' },
+      { start: 7, end: 9, label: 'three' },
+    ]);
+
+    expect(updateEntitiesBoudaries('first is here', oldText, entities)).toStrictEqual([
+      { start: 0, end: 5, label: 'one' },
+      { start: 1, end: 4, label: 'one_2' },
+      { start: 9, end: 13, label: 'two' },
+      { start: 6, end: 8, label: 'three' },
+    ]);
+
+    expect(updateEntitiesBoudaries('first word  here', oldText, entities)).toStrictEqual([
+      { start: 0, end: 5, label: 'one' },
+      { start: 1, end: 4, label: 'one_2' },
+      { start: 12, end: 16, label: 'two' },
+    ]);
+  });
+
+  describe('will remove entity single char entity', () => {
+    it('if we don\'t have any other occurencies', () => {
+      expect(updateEntitiesBoudaries('irst word is here', 'first word is here', [
+        { start: 0, end: 1, label: 'one' },
+        { start: 14, end: 18, label: 'two' },
+      ])).toStrictEqual([
+        { start: 13, end: 17, label: 'two' },
+      ]);
+    });
+
+    it.skip('if other occurency is too far from the original', () => {
+      expect(updateEntitiesBoudaries('frst word is here', 'first word is here', [
+        { start: 1, end: 2, label: 'one' },
+        { start: 14, end: 18, label: 'two' },
+      ])).toStrictEqual([
+        { start: 13, end: 17, label: 'two' },
+      ]);
+    });
+
+    it.skip('if other occurency is already fully contains the entity', () => {
+      expect(updateEntitiesBoudaries(', first word is here', 'first, first word is here', [
+        { start: 0, end: 5, label: 'one' },
+        { start: 7, end: 12, label: 'two' },
+      ])).toStrictEqual([
+        //{ start: 2, end: 7, label: 'one' },
+        { start: 2, end: 7, label: 'two' },
+      ]);
+    });
+  });
+
+  describe('in the middle of the entity', () => {
+    it('basic', () => {
+      expect(updateEntitiesBoudaries('firast word is here', oldText, entities)).toStrictEqual([
+        { start: 0, end: 6, label: 'one' },
+        { start: 1, end: 5, label: 'one_2' },
+        { start: 15, end: 19, label: 'two' },
+        { start: 12, end: 14, label: 'three' },
+      ]);
+
+      expect(updateEntitiesBoudaries('firsat word is here', oldText, [
+        ...entities,
+        { start: 2, end: 6, label: 'one_3' },
+      ])).toStrictEqual([
+        { start: 0, end: 6, label: 'one' },
+        { start: 1, end: 4, label: 'one_2' },
+        { start: 15, end: 19, label: 'two' },
+        { start: 12, end: 14, label: 'three' },
+        { start: 2, end: 7, label: 'one_3' },
+      ]);
+
+      // ingnore becouse the old entity could be fully moved in new place
+      expect(updateEntitiesBoudaries('first word iss here', oldText, entities)).toStrictEqual([
+        { start: 0, end: 5, label: 'one' },
+        { start: 1, end: 4, label: 'one_2' },
+        { start: 15, end: 19, label: 'two' },
+        { start: 11, end: 13, label: 'three' },
+      ]);
+
+      expect(updateEntitiesBoudaries('first word ias here', oldText, entities)).toStrictEqual([
+        { start: 0, end: 5, label: 'one' },
+        { start: 1, end: 4, label: 'one_2' },
+        { start: 15, end: 19, label: 'two' },
+        { start: 11, end: 14, label: 'three' },
+      ]);
+
+      expect(updateEntitiesBoudaries('first word is heeeeere', oldText, entities)).toStrictEqual([
+        { start: 0, end: 5, label: 'one' },
+        { start: 1, end: 4, label: 'one_2' },
+        { start: 14, end: 22, label: 'two' },
+        { start: 11, end: 13, label: 'three' },
+      ]);
+
+      expect(updateEntitiesBoudaries('feeeeeeeeeeirst word is here', oldText, entities)).toStrictEqual([
+        { start: 0, end: 15, label: 'one' },
+        { start: 11, end: 14, label: 'one_2' },
+        { start: 24, end: 28, label: 'two' },
+        { start: 21, end: 23, label: 'three' },
+      ]);
+
+      // Doesn't support two simultanius changes in the middle of two entities
+      expect(updateEntitiesBoudaries('feeeeeeeeeeirst word is heeeeeeere', oldText, entities)).toStrictEqual([
+        { start: 11, end: 14, label: 'one_2' },
+        { start: 21, end: 23, label: 'three' },
+      ]);
+    });
+
+    it.skip('if other occurency is already fully contains the entity', () => {
+      expect(updateEntitiesBoudaries('first, firsst word is here', 'first, first word is here', [
+        { start: 0, end: 5, label: 'one' },
+        { start: 7, end: 12, label: 'two' },
+      ])).toStrictEqual([
+        { start: 0, end: 5, label: 'one' },
+        { start: 7, end: 13, label: 'two' },
+      ]);
+    });
+
   });
 });
